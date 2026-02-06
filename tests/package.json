@@ -1,0 +1,23 @@
+{
+  "name": "tests",
+  "private": true,
+  "version": "0.0.0",
+  "description": "API and E2E tests for the monorepo",
+  "scripts": {
+    "test:api": "playwright test --config=playwright.config.ts --grep @api",
+    "test:api:crud": "playwright test --config=playwright.config.ts --grep @crud",
+    "test:api:scenarios": "playwright test --config=playwright.config.ts --grep @scenario",
+    "test:e2e": "playwright test --config=playwright.config.ts --grep @e2e",
+    "test": "playwright test --config=playwright.config.ts",
+    "test:ci": "playwright test --config=playwright.config.ts --reporter=junit",
+    "bruno:run": "cd collections/core-api && bru run --env local",
+    "bruno:run:core-api": "cd collections/core-api && bru run --env local",
+    "generate:bruno": "tsx scripts/generate-bruno.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^22.0.0",
+    "@usebruno/cli": "^1.36.5",
+    "tsx": "^4.19.0"
+  }
+}

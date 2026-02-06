@@ -1,0 +1,67 @@
+{
+  "name": "@repo/nestjs-config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/config.module.js",
+  "types": "./dist/config.module.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/config.module.d.ts",
+      "default": "./dist/config.module.js"
+    },
+    "./module": {
+      "types": "./dist/config.module.d.ts",
+      "default": "./dist/config.module.js"
+    },
+    "./service": {
+      "types": "./dist/config.service.d.ts",
+      "default": "./dist/config.service.js"
+    },
+    "./base": {
+      "types": "./dist/environment-variables.base.d.ts",
+      "default": "./dist/environment-variables.base.js"
+    },
+    "./load-secrets": {
+      "types": "./dist/load-secrets.d.ts",
+      "default": "./dist/load-secrets.js"
+    },
+    "./nest": "./nest.json",
+    "./nestjs": "./nestjs.js"
+  },
+  "typesVersions": {
+    "*": {
+      "module": ["./dist/config.module.d.ts"],
+      "service": ["./dist/config.service.d.ts"],
+      "base": ["./dist/environment-variables.base.d.ts"],
+      "load-secrets": ["./dist/load-secrets.d.ts"]
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.1",
+    "@google-cloud/secret-manager": "^5.6.0",
+    "class-validator": "^0.14.1",
+    "class-transformer": "^0.5.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "^22.10.7",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0"
+  }
+}

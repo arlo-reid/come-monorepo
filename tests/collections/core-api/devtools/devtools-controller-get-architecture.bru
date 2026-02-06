@@ -1,0 +1,19 @@
+meta {
+  name: devtools-controller-get-architecture
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/__arch
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}

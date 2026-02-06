@@ -1,0 +1,19 @@
+meta {
+  name: devtools-controller-serve-ui
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/__arch/ui
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}

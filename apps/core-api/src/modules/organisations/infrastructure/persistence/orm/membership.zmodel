@@ -1,0 +1,55 @@
+import '../../../../../libs/db/orm/base-entity.zmodel'
+import '../../../../users/infrastructure/persistence/orm/user.zmodel'
+import './organisation.zmodel'
+
+/**
+ * Membership Entity
+ *
+ * Represents a user's membership in an organisation with a specific role.
+ * Memberships are owned by the Organisation aggregate - all mutations
+ * should go through the Organisation.
+ */
+model Membership with BaseEntity {
+    userId         String
+    organisationId String
+    role           String    @default("ORG_MEMBER")
+
+    // Relations
+    user           User         @relation(fields: [userId], references: [id])
+    organisation   Organisation @relation(fields: [organisationId], references: [id])
+
+    // Unique constraint - user can only have one membership per org
+    @@unique([userId, organisationId])
+
+    // Policies
+    @@allow('all', 'SYSTEM_ADMIN' in auth().roles) // SYSTEM_ADMIN has full access
+
+    // Read: Members can read their own memberships, admins can read all org memberships
+    @@allow('read', auth() != null && (
+        userId == auth().id ||
+        organisation.ownerId == auth().id ||
+        organisation.memberships?[userId == auth().id && role == 'ORG_ADMIN']
+    ))
+
+    // Create: Only org owner or org admins can create memberships
+    @@allow('create', auth() != null && (
+        organisation.ownerId == auth().id ||
+        organisation.memberships?[userId == auth().id && role == 'ORG_ADMIN']
+    ))
+
+    // Update: Only org owner or org admins can update memberships
+    @@allow('update', auth() != null && (
+        organisation.ownerId == auth().id ||
+        organisation.memberships?[userId == auth().id && role == 'ORG_ADMIN']
+    ))
+
+    // Delete: Only org owner or org admins can delete memberships
+    // Note: Owner membership cannot be deleted (enforced in domain)
+    @@allow('delete', auth() != null && (
+        organisation.ownerId == auth().id ||
+        organisation.memberships?[userId == auth().id && role == 'ORG_ADMIN'] ||
+        userId == auth().id // Allow users to delete their own membership (leave org)
+    ))
+
+    @@map("memberships")
+}

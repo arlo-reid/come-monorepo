@@ -1,0 +1,33 @@
+import '../../../../../libs/db/orm/base-entity.zmodel'
+import './user.zmodel'
+
+enum AuthProviderType {
+    email_password
+    google
+    apple
+}
+
+model Account with BaseEntity {
+    userId              String
+    providerType        AuthProviderType
+    providerAccountId   String           @unique
+    providerEmail       String?
+    providerDisplayName String?
+    providerPhotoUrl    String?
+    accessToken         String?
+    refreshToken        String?
+    tokenExpiresAt      DateTime?
+
+    user                User             @relation(fields: [userId], references: [id])
+
+    // Access policies
+    @@allow('all', 'SYSTEM_ADMIN' in auth().roles) // SYSTEM_ADMIN has full access
+    
+    @@allow('create', auth() != null && auth().id == userId)   // Users can link accounts to themselves
+    @@allow('read', auth() != null && auth().id == userId)     // Users can read their own accounts
+    @@allow('update', auth() != null && auth().id == userId)   // Users can update their own accounts
+    @@allow('delete', auth() != null && auth().id == userId)   // Users can delete their own accounts
+
+    @@unique([userId, providerType])
+    @@map("accounts")
+}

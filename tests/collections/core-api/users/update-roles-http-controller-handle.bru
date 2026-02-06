@@ -1,0 +1,31 @@
+meta {
+  name: Update user roles
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/users/{{userId}}/roles
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "roles": [
+      "SYSTEM_ADMIN"
+    ]
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Updates the roles of a user. Requires SYSTEM_ADMIN role.
+}

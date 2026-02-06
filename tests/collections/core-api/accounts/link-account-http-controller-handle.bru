@@ -1,0 +1,29 @@
+meta {
+  name: Link a new authentication provider to current user
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/accounts/link
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "providerType": "google",
+    "providerAccountId": "firebase-uid-123",
+    "providerEmail": "user@gmail.com",
+    "providerDisplayName": "John Doe",
+    "providerPhotoUrl": "https://lh3.googleusercontent.com/..."
+  }
+}
+
+assert {
+  res.status: eq 201
+}

@@ -1,0 +1,12 @@
+module "service" {
+  name     = var.name
+  source   = "../../modules/cloud-run"
+  location  = var.location
+  image    = "us-docker.pkg.dev/${var.project}/registry/web:${var.docker_tag}"
+  service_account_name = google_service_account.service_account.email
+  env = concat([
+    { name: "CORE_API_URL", value: var.core_api_url },
+  ])
+  allow_public_access = true
+  depends_on = [null_resource.iam_depends_on]
+}

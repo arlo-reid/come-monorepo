@@ -1,0 +1,115 @@
+name: Terraform plan
+on:
+  pull_request:
+    branches:
+      - main
+      - demo
+      - staging
+      - production
+jobs:
+  dev:
+    if: github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-google-cloud-auth
+        with:
+          google_cloud_token: ${{ secrets.GOOGLE_CLOUD_TOKEN_DEV }}
+
+      - name: "Run terraform plan against dev"
+        uses: ./.github/actions/terraform-plan
+        with:
+          environment: "dev"
+          terraform-bucket: ${{ vars.PROJECT_TF_STATE_BUCKET_DEV }}
+          region: ${{ vars.PROJECT_REGION_DEV }}
+          project-uid: ${{ vars.PROJECT_UID_DEV }}
+          prefix: ${{ vars.PROJECT_PREFIX_DEV }}
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          docker-tag: "latest"
+  demo:
+    if: github.base_ref == 'demo'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-google-cloud-auth
+        with:
+          google_cloud_token: ${{ secrets.GOOGLE_CLOUD_TOKEN_DEMO }}
+
+      - name: "Run terraform plan against demo"
+        uses: ./.github/actions/terraform-plan
+        with:
+          environment: "demo"
+          terraform-bucket: ${{ vars.PROJECT_TF_STATE_BUCKET_DEMO }}
+          region: ${{ vars.PROJECT_REGION_DEMO }}
+          project-uid: ${{ vars.PROJECT_UID_DEMO }}
+          prefix: ${{ vars.PROJECT_PREFIX_DEMO }}
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          docker-tag: "latest"
+
+  staging:
+    if: github.base_ref == 'staging'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-google-cloud-auth
+        with:
+          google_cloud_token: ${{ secrets.GOOGLE_CLOUD_TOKEN_STAGING }}
+
+      - name: "Run terraform plan against staging"
+        uses: ./.github/actions/terraform-plan
+        with:
+          environment: "staging"
+          terraform-bucket: ${{ vars.PROJECT_TF_STATE_BUCKET_STAGING }}
+          region: ${{ vars.PROJECT_REGION_STAGING }}
+          project-uid: ${{ vars.PROJECT_UID_STAGING }}
+          prefix: ${{ vars.PROJECT_PREFIX_STAGING }}
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          docker-tag: "latest"
+
+  production:
+    if: github.base_ref == 'production'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-google-cloud-auth
+        with:
+          google_cloud_token: ${{ secrets.GOOGLE_CLOUD_TOKEN_PRODUCTION }}
+
+      - name: "Run terraform plan against production"
+        uses: ./.github/actions/terraform-plan
+        with:
+          environment: "production"
+          terraform-bucket: ${{ vars.PROJECT_TF_STATE_BUCKET_PRODUCTION }}
+          region: ${{ vars.PROJECT_REGION_PRODUCTION }}
+          project-uid: ${{ vars.PROJECT_UID_PRODUCTION }}
+          prefix: ${{ vars.PROJECT_PREFIX_PRODUCTION }}
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          docker-tag: "latest"

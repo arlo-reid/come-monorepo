@@ -1,0 +1,21 @@
+meta {
+  name: Update a member role
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/organisations/{{orgSlug}}/memberships/{{id}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "role": "ORG_ADMIN"
+  }
+}
+
+assert {
+  res.status: eq 200
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Get an organisation by its slug
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/organisations/{{slug}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+assert {
+  res.status: eq 200
+}

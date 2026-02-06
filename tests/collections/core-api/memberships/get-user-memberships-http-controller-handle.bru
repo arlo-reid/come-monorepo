@@ -1,0 +1,15 @@
+meta {
+  name: List current user memberships
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/users/me/memberships
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}

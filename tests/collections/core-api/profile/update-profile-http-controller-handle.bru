@@ -1,0 +1,25 @@
+meta {
+  name: Update current user profile
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/profile
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "displayName": "John Doe",
+    "avatarUrl": "https://example.com/avatar.jpg",
+    "bio": "Software engineer passionate about clean code",
+    "timezone": "America/New_York",
+    "locale": "en-US"
+  }
+}
+
+assert {
+  res.status: eq 200
+}

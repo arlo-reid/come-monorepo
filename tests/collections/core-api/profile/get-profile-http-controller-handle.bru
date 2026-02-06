@@ -1,0 +1,15 @@
+meta {
+  name: Get current user profile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/profile
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}

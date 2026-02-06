@@ -1,0 +1,15 @@
+meta {
+  name: Delete current user account
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/users/me
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 204
+}

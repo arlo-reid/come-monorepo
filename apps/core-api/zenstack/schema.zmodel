@@ -1,0 +1,17 @@
+// Import bounded context models
+import "../src/modules/organisations/infrastructure/persistence/orm/organisation.zmodel"
+import "../src/modules/users/infrastructure/persistence/orm/user.zmodel"
+import "../src/modules/users/infrastructure/persistence/orm/account.zmodel"
+import "../src/modules/users/infrastructure/persistence/orm/profile.zmodel"
+// Membership is imported by organisation.zmodel (lives in organisations module)
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// Enable access control policies
+plugin policy {
+    provider = "@zenstackhq/plugin-policy"
+}
+

@@ -1,0 +1,26 @@
+import '../../../../../libs/db/orm/base-entity.zmodel'
+import './account.zmodel'
+import './profile.zmodel'
+import '../../../../organisations/infrastructure/persistence/orm/organisation.zmodel'
+import '../../../../organisations/infrastructure/persistence/orm/membership.zmodel'
+
+model User with BaseEntity {
+    email            String    @unique
+    emailVerified    Boolean   @default(false)
+    primaryAccountId String?
+    roles            String[]  @default([]) // Array of role strings (e.g., ["SYSTEM_ADMIN"])
+
+    accounts         Account[]
+    profile          Profile?
+    ownedOrganisations Organisation[]
+    memberships      Membership[]
+
+    // Access policies
+    @@allow('all', 'SYSTEM_ADMIN' in auth().roles) // SYSTEM_ADMIN has full access
+
+    @@allow('read', auth() != null && auth().id == this.id)    // Users can read their own data
+    @@allow('update', auth() != null && auth().id == this.id)  // Users can update their own data
+    @@allow('delete', auth() != null && auth().id == this.id)  // Users can delete themselves
+
+    @@map("users")
+}

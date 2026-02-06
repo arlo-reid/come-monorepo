@@ -1,0 +1,19 @@
+meta {
+  name: Unlink an authentication provider from current user
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/accounts/unlink/{{providerType}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+assert {
+  res.status: eq 204
+}

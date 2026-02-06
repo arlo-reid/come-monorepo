@@ -1,0 +1,26 @@
+meta {
+  name: Add a member to an organisation
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/organisations/{{orgSlug}}/memberships
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "userId": "47797bec-b1dd-4330-b772-9cbcbfe2eba3",
+    "role": "ORG_MEMBER"
+  }
+}
+
+vars:pre-request {
+  orgSlug: my-organisation
+}
+
+assert {
+  res.status: eq 201
+}

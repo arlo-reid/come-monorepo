@@ -1,0 +1,63 @@
+name: "Build docker container"
+description: "Builds a docker container"
+inputs:
+  google_cloud_token:
+    description: "google cloud token"
+    required: true
+  turborepo_cache_bucket:
+    description: "turborepo cache bucket"
+    required: true
+  sentry_token:
+    description: "sentry auth token"
+    required: true
+  registry:
+    description: "registry to push too"
+    required: true
+  service:
+    description: "service"
+    required: true
+  with_puppeteer:
+    description: "whether to include puppeteer in the build"
+    required: false
+    default: "false"
+  dockerfile:
+    description: "service"
+    required: true
+  tag:
+    description: "service"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: ./.github/actions/setup-google-cloud-auth
+      id: "auth"
+      with:
+        google_cloud_token: ${{ inputs.google_cloud_token }}
+
+    - uses: ./.github/actions/setup-turborepo-remote-cache
+      id: "turborepo-cache"
+      with:
+        bucket: ${{ inputs.turborepo_cache_bucket }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        buildkitd-config: .github/buildkitd.toml
+
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        context: .
+        tags: ${{ inputs.registry }}/${{ inputs.service }}:${{ inputs.tag }},${{ inputs.registry }}/${{ inputs.service }}:latest
+        file: ${{ inputs.dockerfile }}
+        cache-to: type=registry,ref=${{ inputs.registry }}/${{ inputs.service }}:buildcache,mode=max,compression=zstd
+        cache-from: type=registry,ref=${{ inputs.registry }}/${{ inputs.service }}:buildcache
+        build-args: |
+          APP_NAME=${{ inputs.service }}
+          WITH_PUPPETEER=${{ inputs.with_puppeteer }}
+          TURBO_TOKEN=${{ steps.turborepo-cache.outputs.TURBO_TOKEN }}
+          TURBO_TEAMID=${{ steps.turborepo-cache.outputs.TURBO_TEAMID }}
+          TURBO_API=${{ steps.turborepo-cache.outputs.TURBO_API_FOR_DOCKER }}
+          SENTRY_AUTH_TOKEN=${{ inputs.sentry_token }}

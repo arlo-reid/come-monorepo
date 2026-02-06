@@ -1,0 +1,15 @@
+name: "Service matrix"
+description: "Builds a matrix of all the services"
+outputs:
+  matrix:
+    description: "matrix of services and their docker file"
+    value: ${{ steps.matrix.outputs.matrix }}
+runs:
+  using: "composite"
+  steps:
+    - name: matrix
+      id: matrix
+      shell: bash
+      run: |
+        coreapi='{ "service": "core-api", "dockerfile": "tooling/docker/nest/Dockerfile" }'
+        echo "matrix={\"include\":[$coreapi]}" >> $GITHUB_OUTPUT

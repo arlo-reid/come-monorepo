@@ -1,0 +1,82 @@
+name: Pull request
+on:
+  pull_request:
+    branches:
+      - main
+      - demo
+      - staging
+      - production
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 23.3.0
+          cache: npm
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Restore node_modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/package-lock.json') }}
+
+      - uses: ./.github/actions/setup-google-cloud-auth
+        with:
+          google_cloud_token: ${{ secrets.GOOGLE_CLOUD_TOKEN_DEV }}
+
+      - uses: ./.github/actions/setup-turborepo-remote-cache
+        with:
+          bucket: ${{ vars.PROJECT_TURBOREPO_BUCKET_DEV }}
+
+      - name: Enable Corepack
+        run: npm i -g --force corepack && corepack enable
+        
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build dependencies
+        run: npm run build
+        env:
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Test
+        run: npm run test
+        env:
+          SKIP_SECRETS: true
+          NODE_ENV: test
+
+      - name: Run test coverage
+        run: npm run test:cov -- --force
+        env:
+          SKIP_SECRETS: true
+          NODE_ENV: test
+
+      - name: Add coverage comment
+        continue-on-error: true
+        uses: ScaCap/code-coverage-assistant@v1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          monorepo-base-path: "./apps"
+
+      - name: Run cypress tests
+        run: npm run test:cypress

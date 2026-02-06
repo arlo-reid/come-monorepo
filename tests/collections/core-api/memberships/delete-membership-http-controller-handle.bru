@@ -1,0 +1,15 @@
+meta {
+  name: Remove a member from an organisation
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/organisations/{{orgSlug}}/memberships/{{id}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 204
+}

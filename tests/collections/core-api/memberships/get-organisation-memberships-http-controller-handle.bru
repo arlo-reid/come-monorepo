@@ -1,0 +1,19 @@
+meta {
+  name: List members of an organisation
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/organisations/{{orgSlug}}/memberships
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  orgSlug: my-organisation
+}
+
+assert {
+  res.status: eq 200
+}

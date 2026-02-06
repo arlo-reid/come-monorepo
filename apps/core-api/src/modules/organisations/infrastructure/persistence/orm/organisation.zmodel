@@ -1,0 +1,32 @@
+import '../../../../../libs/db/orm/base-entity.zmodel'
+import '../../../../users/infrastructure/persistence/orm/user.zmodel'
+import './membership.zmodel'
+
+model Organisation with BaseEntity {
+    slug      String    @unique
+    name      String
+
+    // Owner relationship - the user who created the organisation
+    ownerId   String
+    owner     User      @relation(fields: [ownerId], references: [id])
+
+    // Memberships - users who belong to this organisation
+    memberships Membership[]
+
+    // Policies - authenticated users can create, owners/admins can read/update, only owner can delete
+    @@allow('all', 'SYSTEM_ADMIN' in auth().roles) // SYSTEM_ADMIN has full access
+
+    @@allow('create', auth() != null)
+    @@allow('read', auth() != null && (
+        auth().id == ownerId ||
+        memberships?[userId == auth().id]
+    ))
+    // Allow owner or org admins to update (needed for membership management via nested updates)
+    @@allow('update', auth() != null && (
+        auth().id == ownerId ||
+        memberships?[userId == auth().id && role == 'ORG_ADMIN']
+    ))
+    @@allow('delete', auth() != null && auth().id == ownerId)
+
+    @@map("organisations")
+}

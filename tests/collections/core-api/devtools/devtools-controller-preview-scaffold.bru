@@ -1,0 +1,19 @@
+meta {
+  name: devtools-controller-preview-scaffold
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/__arch/scaffold/preview
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+assert {
+  res.status: eq 201
+}

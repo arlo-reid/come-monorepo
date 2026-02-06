@@ -1,0 +1,32 @@
+meta {
+  name: Login as admin with email/password
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "email": "{{adminEmail}}",
+    "password": "Testing123!"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  const body = res.getBody()
+  console.log(body)
+  bru.setVar("idToken", body.auth.idToken)
+}

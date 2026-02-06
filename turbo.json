@@ -1,0 +1,40 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "GOOGLE_CLIENT_ID",
+        "NEXTAUTH_URL",
+        "SUPPORT_EMAIL",
+        "FROM_EMAIL",
+        "GOOGLE_CLIENT_SECRET",
+        "NEXTAUTH_SECRET" 
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "cache": false
+    },
+    "test:api": {
+      "cache": false,
+      "env": ["API_BASE_URL", "TEST_ENV"]
+    },
+    "test:e2e": {
+      "cache": false,
+      "env": ["API_BASE_URL", "TEST_ENV"]
+    }
+  }
+}

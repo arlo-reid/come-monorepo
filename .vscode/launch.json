@@ -1,0 +1,83 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug webapp",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/apps/web",
+      "serverReadyAction": {
+        "pattern": "started server on .+, url: (https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    },
+    {
+      "name": "Jest: Run Current File",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm test -- --testPathPattern=${relativeFile}",
+      "cwd": "${workspaceFolder}/apps/core-api"
+    },
+    {
+      "name": "Jest: Debug Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "--testPathPattern=${relativeFile}",
+        "--runInBand",
+        "--no-coverage",
+        "--no-cache"
+      ],
+      "cwd": "${workspaceFolder}/apps/core-api",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": ["--inspect-brk"],
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "Jest: Debug Current File (Watch)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "--testPathPattern=${relativeFile}",
+        "--runInBand",
+        "--no-coverage",
+        "--no-cache",
+        "--watch"
+      ],
+      "cwd": "${workspaceFolder}/apps/core-api",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": ["--inspect-brk"],
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "Debug Core API",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/apps/core-api",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "Debug Core API (Attach)",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "timeout": 10000,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

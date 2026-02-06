@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "study-planet",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

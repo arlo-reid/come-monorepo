@@ -1,0 +1,29 @@
+meta {
+  name: Get paginated list of organisations
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/organisations?limit=20&offset=0
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.items: isDefined
+  res.body.pagination: isDefined
+  res.body.pagination.total: isNumber
+  res.body.pagination.limit: eq 20
+  res.body.pagination.offset: eq 0
+  res.body.pagination.hasMore: isBoolean
+}
+
+docs {
+  Get a paginated list of organisations.
+  
+  Query parameters:
+  - limit: Number of items per page (1-100, default 20)
+  - offset: Number of items to skip (default 0)
+}

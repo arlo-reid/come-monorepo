@@ -1,0 +1,34 @@
+meta {
+  name: Create a new organisation
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/organisations
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Test Org {{orgUid}}",
+    "slug": "test-org-{{orgUid}}"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:pre-request {
+  const nanoid = require('nanoid');
+  
+  const uid = nanoid.nanoid(4);
+  bru.setVar('orgUid', uid.toLowerCase());
+}
+
+script:post-response {
+  const body = res.getBody()
+  bru.setVar('orgSlug', body.slug)
+}

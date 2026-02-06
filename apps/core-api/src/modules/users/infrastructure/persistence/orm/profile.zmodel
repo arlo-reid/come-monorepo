@@ -1,0 +1,26 @@
+import '../../../../../libs/db/orm/base-entity.zmodel'
+import './user.zmodel'
+
+model Profile with BaseEntity {
+    userId               String   @unique
+    displayName          String?
+    avatarUrl            String?
+    bio                  String?
+    timezone             String   @default("UTC")
+    locale               String   @default("en")
+    emailNotifications   Boolean  @default(true)
+    pushNotifications    Boolean  @default(true)
+    marketingEmails      Boolean  @default(false)
+
+    user                 User     @relation(fields: [userId], references: [id])
+
+    // Access policies
+    @@allow('all', 'SYSTEM_ADMIN' in auth().roles) // SYSTEM_ADMIN has full access
+    
+    @@allow('create', auth() != null && auth().id == userId)   // Users can create their own profile
+    @@allow('read', auth() != null && auth().id == userId)     // Users can read their own profile
+    @@allow('update', auth() != null && auth().id == userId)   // Users can update their own profile
+    @@allow('delete', auth() != null && auth().id == userId)   // Users can delete their own profile
+
+    @@map("profiles")
+}

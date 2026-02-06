@@ -1,0 +1,18 @@
+/**
+ * Base Entity Mixin
+ *
+ * Provides common fields for all domain entities:
+ * - id: UUID primary key
+ * - createdAt: Automatic creation timestamp
+ * - updatedAt: Automatic update timestamp
+ *
+ * Usage: Extend this in bounded context models
+ */
+type BaseEntity {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    deletedAt DateTime?
+
+    @@deny('read', deletedAt != null)
+}

@@ -1,0 +1,79 @@
+name: Initialize environments
+on: 
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        required: true
+        type: choice
+        options:
+          - DEV
+          - DEMO
+          - STAGE
+          - PROD
+
+env:
+  DOCKER_TAG: initialize-run-${{ github.run_number }}
+  ENV_LOWER: ${{ inputs.environment }}
+
+jobs:
+  prebuild:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: ./.github/actions/services-matrix
+        id: "matrix"
+
+  build:
+    needs: prebuild
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.prebuild.outputs.matrix) }}
+    steps:
+      - uses: "actions/checkout@v4"
+      - name: "Configure env variables"
+        run: |
+          ENVIRONMENT="${{ inputs.environment }}"
+          ENV_LOWER=$(echo $ENVIRONMENT | tr '[:upper:]' '[:lower:]')
+
+          project="${{ vars[format('PROJECT_PREFIX_{0}', inputs.environment)] }}-${{ vars[format('PROJECT_UID_{0}', inputs.environment)] }}-$ENV_LOWER"
+          registry="us-docker.pkg.dev/$project/registry"
+
+          echo "project=$project" >> $GITHUB_ENV
+          echo "registry=$registry" >> $GITHUB_ENV
+          echo "ENV_LOWER=$ENV_LOWER" >> $GITHUB_ENV
+      - uses: ./.github/actions/build-docker-container
+        with:
+          google_cloud_token: ${{ secrets[format('GOOGLE_CLOUD_TOKEN_{0}', inputs.environment)] }}
+          turborepo_cache_bucket: ${{ vars[format('PROJECT_TURBOREPO_BUCKET_{0}', inputs.environment)] }}
+          registry: ${{ env.registry }}
+          service: ${{ matrix.service }}
+          dockerfile: ${{ matrix.dockerfile }}
+          tag: ${{ env.DOCKER_TAG }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/checkout@v4"
+      - name: "Set environment lowercase variable"
+        run: |
+          ENVIRONMENT="${{ inputs.environment }}"
+          ENV_LOWER=$(echo $ENVIRONMENT | tr '[:upper:]' '[:lower:]')
+          echo "ENV_LOWER=$ENV_LOWER" >> $GITHUB_ENV
+
+      - uses: ./.github/actions/setup-google-cloud-auth
+        id: "auth"
+        with:
+          google_cloud_token: ${{ secrets[format('GOOGLE_CLOUD_TOKEN_{0}', inputs.environment)] }}
+
+      - uses: ./.github/actions/terraform-apply
+        with:
+          environment: "${{ env.ENV_LOWER }}"
+          terraform-bucket: ${{ vars[format('PROJECT_TF_STATE_BUCKET_{0}', inputs.environment)] }}
+          region: ${{ vars[format('PROJECT_REGION_{0}', inputs.environment)] }}
+          project-uid: ${{ vars[format('PROJECT_UID_{0}', inputs.environment)] }}
+          prefix: ${{ vars[format('PROJECT_PREFIX_{0}', inputs.environment)] }}
+          docker-tag: ${{ env.DOCKER_TAG }}

@@ -26,7 +26,7 @@
     "db:migrate:deploy": "zen migrate deploy"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.1",
+    "@nestjs/common": "^11.1.13",
     "@nestjs/core": "^11.0.1",
     "@nestjs/cqrs": "^11.0.0",
     "@nestjs/platform-express": "^11.0.1",
